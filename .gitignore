@@ -1,1 +1,4 @@
-origin_be/
+be/
+__pycache__/
+.coverage
+be.db
