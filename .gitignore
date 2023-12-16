@@ -1,4 +1,5 @@
-be/
+origin_be/
 __pycache__/
 .coverage
 be.db
+app.log

@@ -79,7 +79,7 @@ class Scraper:
         self.database = "book.db"
         self.tag = ""
         self.page = 0
-        self.pattern_number = re.compile(r"\d+\.?\d*")
+        self.pattern_number = re.compile(r"\d+\.%s\d*")
         logging.basicConfig(filename="scraper.log", level=logging.ERROR)
 
     def get_current_progress(self) -> ():
@@ -147,7 +147,7 @@ class Scraper:
             conn.rollback()
 
     def grab_tag(self):
-        url = "https://book.douban.com/tag/?view=cloud"
+        url = "https://book.douban.com/tag/%sview=cloud"
         r = requests.get(url, headers=get_user_agent())
         r.encoding = "utf-8"
         h: etree.ElementBase = etree.HTML(r.text)
@@ -175,7 +175,7 @@ class Scraper:
     def grab_book_list(self, tag="小说", pageno=1) -> bool:
         logging.info("start to grab tag {} page {}...".format(tag, pageno))
         self.save_current_progress(tag, pageno)
-        url = "https://book.douban.com/tag/{}?start={}&type=T".format(tag, pageno)
+        url = "https://book.douban.com/tag/{}%sstart={}&type=T".format(tag, pageno)
         r = requests.get(url, headers=get_user_agent())
         r.encoding = "utf-8"
         h: etree.Element = etree.HTML(r.text)
@@ -352,12 +352,12 @@ class Scraper:
             "author_intro, book_intro, content, "
             "tags, picture)"
             "VALUES("
-            "?, ?, ?, "
-            "?, ?, ?, "
-            "?, ?, ?, "
-            "?, ?, ?, "
-            "?, ?, ?, "
-            "?, ?)"
+            "%s, %s, %s, "
+            "%s, %s, %s, "
+            "%s, %s, %s, "
+            "%s, %s, %s, "
+            "%s, %s, %s, "
+            "%s, %s)"
         )
 
         unit = None
