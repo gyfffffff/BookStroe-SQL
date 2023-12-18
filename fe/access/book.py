@@ -54,7 +54,7 @@ class BookDB:
             "price, currency_unit, binding, "
             "isbn, author_intro, book_intro, "
             "content, tags, picture FROM book ORDER BY id "
-            "LIMIT %s OFFSET %s",
+            "LIMIT ? OFFSET ?",
             (size, start),
         )
         for row in cursor:

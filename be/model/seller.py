@@ -1,7 +1,7 @@
-import sqlite3 as sqlite
+import psycopg2
 from be.model import error
 from be.model import db_conn
-
+import json
 
 class Seller(db_conn.DBConn):
     def __init__(self):
@@ -23,15 +23,39 @@ class Seller(db_conn.DBConn):
             if self.book_id_exist(store_id, book_id):
                 return error.error_exist_book_id(book_id)
 
+            book_info = json.loads(book_json_str)
+
             self.cursor.execute(
-                "INSERT into store(store_id, book_id, book_info, stock_level)"
-                "VALUES (%s, %s, %s, %s)",
-                (store_id, book_id, book_json_str, stock_level),
+                'INSERT into book(book_id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
+                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (
+                    book_id, 
+                    book_info['title'], 
+                    book_info['publisher'], 
+                    book_info['author'], 
+                    book_info['original_title'], 
+                    book_info['translator'], 
+                    book_info['pub_year'], 
+                    book_info['pages'], 
+                    book_info['currency_unit'], 
+                    book_info['binding'], 
+                    book_info['isbn'], 
+                    book_info['author_intro'], 
+                    book_info['book_intro'], 
+                    book_info['content'], 
+                    book_info['tags'], 
+                    book_info['pictures'], 
+                ),
+            )
+            self.cursor.execute(
+                'INSERT into store(book_id,store_id, stock_level, price) VALUES (%s, %s, %s, %s)',
+                (book_id, store_id, stock_level, book_info['price']),
             )
             self.database.commit()
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             return 528, "{}".format(str(e))
         except BaseException as e:
+            print(e)
             return 530, "{}".format(str(e))
         return 200, "ok"
 
@@ -52,7 +76,7 @@ class Seller(db_conn.DBConn):
                 (add_stock_level, store_id, book_id),
             )
             self.database.commit()
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))
@@ -65,11 +89,11 @@ class Seller(db_conn.DBConn):
             if self.store_id_exist(store_id):
                 return error.error_exist_store_id(store_id)
             self.cursor.execute(
-                "INSERT into user_store(store_id, user_id)" "VALUES (%s, %s)",
-                (store_id, user_id),
+                'INSERT into bookstore(user_id, store_id) VALUES (%s, %s)',
+                (user_id, store_id),
             )
             self.database.commit()
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))

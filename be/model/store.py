@@ -28,21 +28,21 @@ class Store:
             )
 
             cursor.execute(
-                "CREATE TABLE IF NOT EXISTS book_store("
+                "CREATE TABLE IF NOT EXISTS bookstore("
                 "user_id TEXT, store_id TEXT, PRIMARY KEY(user_id, store_id));"
             )
 
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS book( "
                 "book_id TEXT, title TEXT, publisher TEXT, author TEXT,"
-                "tags TEXT, year TEXT, translator TEXT, binding TEXT,"
-                "ISBN TEXT, pages INTEGER, "
+                "original_title TEXT, translator TEXT, pub_year TEXT,pages INTEGER,"
+                "currency_unit TEXT,binding TEXT,isbn TEXT,author_intro TEXT,book_intro text,content TEXT,tags TEXT,picture BYTEA, "
                 "PRIMARY KEY(book_id));"
             )
 
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS store( "
-                "book_id TEXT, store_id TEXT, count INTEGER, price INTEGER, "
+                "book_id TEXT, store_id TEXT, stock_level INTEGER, price INTEGER, "
                 "PRIMARY KEY(book_id, store_id))"
             )
 
@@ -65,7 +65,7 @@ class Store:
 
     def get_db_conn(self):
         return self.database.cursor()
-    
+
     def get_db(self):
         return self.database
 
@@ -81,6 +81,7 @@ def init_database():
 def get_db_conn():
     global database_instance
     return database_instance.get_db_conn()
+
 
 def get_db():
     global database_instance

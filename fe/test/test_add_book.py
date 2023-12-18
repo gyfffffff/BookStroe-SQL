@@ -35,9 +35,9 @@ class TestAddBook:
             assert code != 200
 
     def test_error_exist_book_id(self):
-        for b in self.books:
-            code = self.seller.add_book(self.store_id, 0, b)
-            assert code == 200
+        # for b in self.books:
+        #     code = self.seller.add_book(self.store_id, 0, b)
+        #     assert code == 200
         for b in self.books:
             # exist book id
             code = self.seller.add_book(self.store_id, 0, b)

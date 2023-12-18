@@ -8,9 +8,9 @@ class DBConn:
 
     def user_id_exist(self, user_id):
         cursor = self.cursor.execute(
-            "SELECT user_id FROM 'user' WHERE user_id = %s;", (user_id,)
+            'SELECT user_id FROM "user" WHERE user_id = %s;', (user_id,)
         )
-        row = cursor.fetchone()
+        row = self.cursor.fetchone()
         if row is None:
             return False
         else:
@@ -21,7 +21,7 @@ class DBConn:
             "SELECT book_id FROM store WHERE store_id = %s AND book_id = %s;",
             (store_id, book_id),
         )
-        row = cursor.fetchone()
+        row = self.cursor.fetchone()
         if row is None:
             return False
         else:
@@ -29,9 +29,9 @@ class DBConn:
 
     def store_id_exist(self, store_id):
         cursor = self.cursor.execute(
-            "SELECT store_id FROM user_store WHERE store_id = %s;", (store_id,)
+            "SELECT store_id FROM bookstore WHERE store_id = %s;", (store_id,)
         )
-        row = cursor.fetchone()
+        row = self.cursor.fetchone()
         if row is None:
             return False
         else:

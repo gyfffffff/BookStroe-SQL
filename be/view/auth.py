@@ -32,7 +32,6 @@ def logout():
 def register():
     user_id = request.get_json().get("user_id", "")
     password = request.get_json().get("password", "")
-    print(user_id, password)
     u = user.User()
     code, message = u.register(user_id=user_id, password=password)
     return jsonify({"message": message}), code
