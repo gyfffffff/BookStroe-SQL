@@ -21,6 +21,7 @@ class DBConn:
             "SELECT book_id FROM store WHERE store_id = %s AND book_id = %s;",
             (store_id, book_id),
         )
+        
         row = self.cursor.fetchone()
         if row is None:
             return False
