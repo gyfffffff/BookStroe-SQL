@@ -18,33 +18,33 @@ class TestAddBook:
         code = self.seller.create_store(self.store_id)
         assert code == 200
         book_db = book.BookDB(conf.Use_Large_DB)
-        self.books = book_db.get_book_info(0, 2)
+        self.books = book_db.get_book_info(0, 10)
 
         yield
         # do after test
 
     def test_ok(self):
-        for b in self.books:
+        for b in self.books[0:2]:
             code = self.seller.add_book(self.store_id, 0, b)
             assert code == 200
 
     def test_error_non_exist_store_id(self):
-        for b in self.books:
+        for b in self.books[2:4]:
             # non exist store id
             code = self.seller.add_book(self.store_id + "x", 0, b)
             assert code != 200
 
     def test_error_exist_book_id(self):
-        # for b in self.books:
-        #     code = self.seller.add_book(self.store_id, 0, b)
-        #     assert code == 200
-        for b in self.books:
+        for b in self.books[4: 6]:
+            code = self.seller.add_book(self.store_id, 0, b)
+            assert code == 200
+        for b in self.books[4:6]:
             # exist book id
             code = self.seller.add_book(self.store_id, 0, b)
             assert code != 200
 
     def test_error_non_exist_user_id(self):
-        for b in self.books:
+        for b in self.books[6:8]:
             # non exist user id
             self.seller.seller_id = self.seller.seller_id + "_x"
             code = self.seller.add_book(self.store_id, 0, b)

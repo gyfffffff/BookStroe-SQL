@@ -32,11 +32,9 @@ class Seller:
             "book_info": book_info.__dict__,
             "stock_level": stock_level,
         }
-        # print(simplejson.dumps(json))
         url = urljoin(self.url_prefix, "add_book")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
-        print(r.text)
         return r.status_code
 
     def add_stock_level(
@@ -48,7 +46,6 @@ class Seller:
             "book_id": book_id,
             "add_stock_level": add_stock_num,
         }
-        # print(simplejson.dumps(json))
         url = urljoin(self.url_prefix, "add_stock_level")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)

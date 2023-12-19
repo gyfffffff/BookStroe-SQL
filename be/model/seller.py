@@ -26,27 +26,31 @@ class Seller(db_conn.DBConn):
             book_info = json.loads(book_json_str)
 
             self.cursor.execute(
-                'INSERT into book(book_id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
-                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
-                (
-                    book_id, 
-                    book_info['title'], 
-                    book_info['publisher'], 
-                    book_info['author'], 
-                    book_info['original_title'], 
-                    book_info['translator'], 
-                    book_info['pub_year'], 
-                    book_info['pages'], 
-                    book_info['currency_unit'], 
-                    book_info['binding'], 
-                    book_info['isbn'], 
-                    book_info['author_intro'], 
-                    book_info['book_intro'], 
-                    book_info['content'], 
-                    book_info['tags'], 
-                    book_info['pictures'], 
-                ),
+                "SELECT * FROM book WHERE book_id = %s", (book_id,)
             )
+            if self.cursor.fetchone() is None: 
+                self.cursor.execute(
+                    'INSERT into book(book_id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
+                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                    (
+                        book_id, 
+                        book_info['title'], 
+                        book_info['publisher'], 
+                        book_info['author'], 
+                        book_info['original_title'], 
+                        book_info['translator'], 
+                        book_info['pub_year'], 
+                        book_info['pages'], 
+                        book_info['currency_unit'], 
+                        book_info['binding'], 
+                        book_info['isbn'], 
+                        book_info['author_intro'], 
+                        book_info['book_intro'], 
+                        book_info['content'], 
+                        book_info['tags'], 
+                        book_info['pictures'], 
+                    ),
+                )
             self.cursor.execute(
                 'INSERT into store(book_id,store_id, stock_level, price) VALUES (%s, %s, %s, %s)',
                 (book_id, store_id, stock_level, book_info['price']),

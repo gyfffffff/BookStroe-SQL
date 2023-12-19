@@ -14,7 +14,7 @@ def new_order():
     books: [] = data.get("books")
     id_and_count = []
     for book in books:
-        book_id = book.get("book_id")
+        book_id = book.get("id")
         count = book.get("count")
         id_and_count.append((book_id, count))
 

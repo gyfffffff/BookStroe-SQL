@@ -57,11 +57,8 @@ class User(db_conn.DBConn):
         try:
             terminal = "terminal_{}".format(str(time.time()))
             token = jwt_encode(user_id, terminal)
-            self.cursor.execute(
-                'INSERT into "user"(user_id,password, balance, token, terminal) '
-                "VALUES (%s, %s, %s, %s, %s);",
-                (user_id, password, 0, token, terminal),
-            )
+            sql = '''INSERT into "user"(user_id, password, balance, token, terminal) VALUES (%s, %s, %s, %s, %s);'''
+            self.cursor.execute(sql,(user_id, password, 0, token, terminal))
             self.database.commit()
         except psycopg2.Error:
             self.database.rollback()
