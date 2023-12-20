@@ -4,7 +4,7 @@ import json
 import logging
 from be.model import db_conn
 from be.model import error
-
+import jieba
 
 class Buyer(db_conn.DBConn):
     def __init__(self):
@@ -195,3 +195,65 @@ class Buyer(db_conn.DBConn):
             return 530, "{}".format(str(e))
 
         return 200, "ok"
+    
+    def search_global(self, key, pageIndex=1, pageSize=5):
+        try:
+            if not key:
+                return error.error_missing_args("key")
+            try:
+                if pageIndex == 'None' or int(pageIndex)<1:
+                    pageIndex=1
+                if pageSize == 'None' or int(pageSize)<1:
+                    pageSize=5
+            except:
+                return error.error_args("invalid pageIndex or pageSize")
+            key = jieba.cut(key)
+            key = " | ".join(key)
+            offset = (int(pageIndex) - 1) * int(pageSize)
+            self.cursor.execute(
+                'select * from book where _ts @@ %s::tsquery LIMIT %s OFFSET %s', (key, pageSize, offset)
+            )
+            result = self.cursor.fetchall()
+            self.database.commit()
+        except sqlite.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e)), ""
+        except BaseException as e:
+            self.database.rollback()
+            return 530, "{}".format(str(e)), ""
+        return 200, 'ok', result
+        
+    def search_store(self, key, store_id, pageIndex=1, pageSize=5):
+        try:
+            if not key:
+                return error.error_missing_args("key")+("",)
+            if not store_id:
+                return error.error_missing_args("store_id")+("",)
+            if not self.store_id_exist(store_id):
+                return error.error_non_exist_store_id(store_id)+("",)
+            try:
+                if pageIndex == 'None' or int(pageIndex)<1:
+                    pageIndex=1
+                if pageSize == 'None' or int(pageSize)<1:
+                    pageSize=5
+            except:
+                return error.error_args("invalid pageIndex or pageSize")+("",)
+            key = jieba.cut(key)    
+            key = " | ".join(key)
+            offset = (int(pageIndex) - 1) * int(pageSize)
+            self.cursor.execute(
+                'select * from book where _ts @@ %s::tsquery and id in (select book_id from store where store_id = %s) LIMIT %s OFFSET %s;',
+                (key, store_id, pageSize, offset),
+            )
+            result = self.cursor.fetchall()
+            self.database.commit()
+        except sqlite.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e)), ""
+        except BaseException as e:
+            self.database.rollback()
+            return 530, "{}".format(str(e)), ""
+        return 200, 'ok', result
+    
+            
+

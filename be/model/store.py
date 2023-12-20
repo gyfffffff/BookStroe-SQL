@@ -1,5 +1,4 @@
 import logging
-import os
 import psycopg2
 
 
@@ -34,9 +33,10 @@ class Store:
 
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS book( "
-                "book_id TEXT, title TEXT, publisher TEXT, author TEXT,"
+                "id TEXT, title TEXT, publisher TEXT, author TEXT,"
                 "original_title TEXT, translator TEXT, pub_year TEXT,pages INTEGER,"
-                "currency_unit TEXT,binding TEXT,isbn TEXT,author_intro TEXT,book_intro text,content TEXT,tags TEXT,picture BYTEA, "
+                "currency_unit TEXT,binding TEXT,isbn TEXT,author_intro TEXT,book_intro text,"
+                "content TEXT,tags TEXT,picture TEXT, _ts tsvector, "
                 "PRIMARY KEY(book_id));"
             )
 

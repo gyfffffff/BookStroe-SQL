@@ -14,7 +14,6 @@ class Auth:
 
     def register(self, user_id: str, password: str) -> int:
         json = {"user_id": user_id, "password": password}
-        print("8888", user_id)
         url = urljoin(self.url_prefix, "register")
         r = requests.post(url, json=json)
         print("2020", r.text)

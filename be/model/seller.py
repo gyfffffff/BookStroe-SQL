@@ -2,6 +2,7 @@ import psycopg2
 from be.model import error
 from be.model import db_conn
 import json
+from be.model.utils import cut
 
 class Seller(db_conn.DBConn):
     def __init__(self):
@@ -26,11 +27,11 @@ class Seller(db_conn.DBConn):
             book_info = json.loads(book_json_str)
 
             self.cursor.execute(
-                "SELECT * FROM book WHERE book_id = %s", (book_id,)
+                "SELECT * FROM book WHERE id = %s", (book_id,)
             )
             if self.cursor.fetchone() is None: 
                 self.cursor.execute(
-                    'INSERT into book(book_id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
+                    'INSERT into book(id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
                     'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
                     (
                         book_id, 
@@ -51,12 +52,21 @@ class Seller(db_conn.DBConn):
                         book_info['pictures'], 
                     ),
                 )
+                # 分词
+                tsvec = cut(book_info)   # 返回一个空格分割的字符串
+                self.cursor.execute(
+                    'update book set _ts=%s '
+                    'where id = %s',
+                    (tsvec, book_id)
+                )
+
             self.cursor.execute(
                 'INSERT into store(book_id,store_id, stock_level, price) VALUES (%s, %s, %s, %s)',
                 (book_id, store_id, stock_level, book_info['price']),
             )
             self.database.commit()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
             print(e)
@@ -81,6 +91,7 @@ class Seller(db_conn.DBConn):
             )
             self.database.commit()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))
@@ -98,6 +109,7 @@ class Seller(db_conn.DBConn):
             )
             self.database.commit()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))

@@ -43,3 +43,24 @@ def add_funds():
     b = Buyer()
     code, message = b.add_funds(user_id, password, add_value)
     return jsonify({"message": message}), code
+
+@bp_buyer.route("/search_global", methods=['GET'])
+def search():
+    data = request.args
+    key = data.get('key')
+    pageIndex = data.get('pageIndex', 1)
+    pageSize = data.get('pageSize', 5)
+    b = Buyer()
+    code, message, result = b.search_global(key, pageIndex, pageSize)
+    return jsonify({"message": message, "result": result}), code
+
+@bp_buyer.route("/search_store", methods=['GET'])
+def search_store():
+    data = request.args
+    key = data.get('key')
+    store_id = data.get('store_id')
+    pageIndex = data.get('pageIndex', 1)
+    pageSize = data.get('pageSize', 5)
+    b = Buyer()
+    code, message, result = b.search_store(key, store_id, pageIndex, pageSize)
+    return jsonify({"message": message, "result": result}), code

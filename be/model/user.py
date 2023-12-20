@@ -57,12 +57,12 @@ class User(db_conn.DBConn):
         try:
             terminal = "terminal_{}".format(str(time.time()))
             token = jwt_encode(user_id, terminal)
-            sql = '''INSERT into "user"(user_id, password, balance, token, terminal) VALUES (%s, %s, %s, %s, %s);'''
+            sql = 'INSERT into "user"(user_id, password, balance, token, terminal) VALUES (%s, %s, %s, %s, %s);'
             self.cursor.execute(sql,(user_id, password, 0, token, terminal))
             self.database.commit()
-        except psycopg2.Error:
+        except psycopg2.Error as e:
             self.database.rollback()
-            return error.error_exist_user_id(user_id)
+            return error.error_exist_user_id(e)
         return 200, "ok"
 
     def check_token(self, user_id: str, token: str) -> (int, str):
@@ -104,6 +104,7 @@ class User(db_conn.DBConn):
                 return error.error_authorization_fail() + ("",)
             self.database.commit()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
             return 530, "{}".format(str(e)), ""
@@ -127,6 +128,7 @@ class User(db_conn.DBConn):
 
             self.database.commit()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))
@@ -146,6 +148,7 @@ class User(db_conn.DBConn):
             else:
                 return error.error_authorization_fail()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))
@@ -170,6 +173,7 @@ class User(db_conn.DBConn):
 
             self.database.commit()
         except psycopg2.Error as e:
+            self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))
