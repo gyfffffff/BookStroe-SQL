@@ -74,6 +74,6 @@ class TestSearchOrder:
         assert code != 200
 
     def test_search_all(self):
-        code, order_list = self.buyer.search_order(search_status=1)
+        code, order_list = self.buyer.search_order(search_status=-1)
         assert code == 200
         assert len(order_list) == 12
