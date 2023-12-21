@@ -1,4 +1,4 @@
-import sqlite3 as sqlite
+import psycopg2
 import uuid
 import json
 import logging
@@ -73,7 +73,7 @@ class Buyer(db_conn.DBConn):
 
             self.database.commit()
             order_id = uid
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             logging.info("528, {}".format(str(e)))
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
@@ -161,7 +161,7 @@ class Buyer(db_conn.DBConn):
 
             self.database.commit()
 
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             return 528, "{}".format(str(e))
 
         except BaseException as e:
@@ -189,7 +189,7 @@ class Buyer(db_conn.DBConn):
                 return error.error_non_exist_user_id(user_id)
 
             self.database.commit()
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             return 528, "{}".format(str(e))
         except BaseException as e:
             return 530, "{}".format(str(e))
@@ -215,7 +215,7 @@ class Buyer(db_conn.DBConn):
             )
             result = self.cursor.fetchall()
             self.database.commit()
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             self.database.rollback()
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
@@ -247,7 +247,7 @@ class Buyer(db_conn.DBConn):
             )
             result = self.cursor.fetchall()
             self.database.commit()
-        except sqlite.Error as e:
+        except psycopg2.Error as e:
             self.database.rollback()
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
@@ -255,5 +255,31 @@ class Buyer(db_conn.DBConn):
             return 530, "{}".format(str(e)), ""
         return 200, 'ok', result
     
-         
+    def receive(self, buyer_id, order_id):
+        if not self.user_id_exist(buyer_id):
+            return error.error_non_exist_user_id(buyer_id)
+        try:
+            self.cursor.execute(
+                'SELECT status, user_id FROM "order" WHERE order_id = %s', (order_id,)
+            )
+            row = self.cursor.fetchone()
+            if row is None:
+                return error.error_invalid_order_id(order_id)
+            status = row[0]
+            if status != 2:
+                return error.error_invalid_order_id(order_id)
+            user_id = row[1]
+            if user_id != buyer_id:
+                return error.error_invalid_order_id(order_id)
+            self.cursor.execute(
+                'UPDATE "order" SET status = 3 WHERE order_id = %s', (order_id,)
+            )
+            self.database.commit()
+        except psycopg2.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e))
+        except BaseException as e:
+            self.database.rollback()
+            return 530, "{}".format(str(e))
+        return 200, 'ok'
 

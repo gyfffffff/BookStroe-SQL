@@ -64,3 +64,13 @@ def search_store():
     b = Buyer()
     code, message, result = b.search_store(key, store_id, pageIndex, pageSize)
     return jsonify({"message": message, "result": result}), code
+
+@bp_buyer.route("/receive", methods=["POST"])
+def receive():
+    data = request.get_json(silent=True) or {}
+    user_id: str = data.get("user_id")
+    order_id: str = data.get("order_id")
+    token: str = request.headers.get("token")
+    b = Buyer()
+    code, message = b.receive(user_id, order_id)
+    return jsonify({"message": message}), code

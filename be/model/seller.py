@@ -120,9 +120,6 @@ class Seller(db_conn.DBConn):
         try:
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id)
-            # code, message = self.User.check_token(user_id, token)
-            # if code != 200:
-            #     return code, message
             self.cursor.execute(
                 'SELECT store_id, status FROM "order" WHERE order_id = %s', (order_id,)
             )
@@ -145,5 +142,4 @@ class Seller(db_conn.DBConn):
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
-    
     
