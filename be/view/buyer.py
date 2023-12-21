@@ -74,3 +74,47 @@ def receive():
     b = Buyer()
     code, message = b.receive(user_id, order_id)
     return jsonify({"message": message}), code
+
+'''
+@ search_all_order()
+查询所有订单，根据user_id在order表中查询
+
+order表的属性：
+'order_id'：订单id 
+'buyer_id'：用户购买id 
+'creat_time'： 订单创建时间 
+'payment_deadline'：支付截止时间
+'state'：订单状态信息 
+'order_amount'：购买书本总量
+'seller_store_id'：商家id
+'purchased_book_id'：购买书本id[]
+'purchase_quantity'：购买数量[]
+
+search_state:
+0 查询所有订单
+1 查询待付款订单
+2 查询已付款待发货订单
+3 查询已发货待收货订单
+4 查询已取消订单
+'''
+
+@bp_buyer.route("/search_order", methods=["POST"])
+def search_order():
+    data = request.get_json(silent=True) or {}
+    user_id: str = data.get("buyer_id")
+    search_state: int = data.get("search_state")
+    b = Buyer()
+    # b.delete_order_time()
+    code, message, results = b.search_order(user_id, search_state)
+    # results = [str(result) for result in results]
+    # res_dict = json.dumps(results, ensure_ascii=False)
+    return jsonify({"message": message, "results": results}), code
+
+
+@bp_buyer.route("/delete_order", methods=["POST"])
+def delete_order():
+    user_id: str = request.json.get("buyer_id")
+    order_id: str = request.json.get("order_id")
+    b = Buyer()
+    code, message = b.delete_order(user_id, order_id)
+    return jsonify({"message": message}), code

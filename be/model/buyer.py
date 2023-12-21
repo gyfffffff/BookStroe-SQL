@@ -58,7 +58,7 @@ class Buyer(db_conn.DBConn):
 
                 create_time = self.get_current_time()
                 pay_ddl = self.get_time_after_30_min()
-                status = 0  # 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 5: 已取消
+                status = 0  # 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 4: 已取消
                 order_price += count * price
                 self.cursor.execute(
                     "INSERT INTO order_book(order_id, book_id, count) "
@@ -283,3 +283,24 @@ class Buyer(db_conn.DBConn):
             return 530, "{}".format(str(e))
         return 200, 'ok'
 
+    def search_order(self, user_id, search_state):
+        try:
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id)+("",)
+            if search_state == -1:
+                self.cursor.execute(
+                    'SELECT * FROM "order" WHERE user_id = %s', (user_id,)
+                )
+            else:
+                self.cursor.execute(
+                    'SELECT * FROM "order" WHERE user_id = %s and status = %s', (user_id, search_state)
+                )
+            result = self.cursor.fetchall()
+            self.database.commit()
+        except psycopg2.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e)), ""
+        except BaseException as e:
+            self.database.rollback()
+            return 530, "{}".format(str(e)), ""
+        return 200, 'ok', result

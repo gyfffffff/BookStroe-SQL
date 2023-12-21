@@ -23,11 +23,11 @@ class Buyer:
         # print(simplejson.dumps(json))
         url = urljoin(self.url_prefix, "new_order")
         headers = {"token": self.token}
-        for item in books:
-            print(item)
+        # for item in books:
+        #     print(item)
         r = requests.post(url, headers=headers, json=json)
         response_json = r.json()
-        print("2929", response_json)
+        # print("2929", response_json)
         return r.status_code, response_json.get("order_id")
 
     def payment(self, order_id: str):
@@ -55,7 +55,7 @@ class Buyer:
     def search_global(self, key: str, pageIndex: int = 1, pageSize: int = 5) -> int:
         url = urljoin(self.url_prefix, "search_global")+f"?key={key}&pageIndex={str(pageIndex)}&pageSize={str(pageSize)}"
         headers = {"token": self.token}
-        print(5858, url)
+        # print(5858, url)
         r = requests.get(url, headers=headers)      
         return r.status_code
     
@@ -74,3 +74,15 @@ class Buyer:
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
+    
+    def search_order(self, search_status: str) -> int:
+        json = {
+            "buyer_id": self.user_id,
+            "search_state": search_status,
+        }
+        url = urljoin(self.url_prefix, "search_order")
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        print(8686, r.json().get("results"))
+        return r.status_code, r.json().get("results")
+    

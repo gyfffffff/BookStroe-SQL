@@ -6,7 +6,7 @@ from fe.access.seller import Seller
 import uuid
 from fe.test.gen_book_data import GenBook
 
-class TestSend:
+class TestReceive:
     seller_id: str
     store_id: str
     buyer_id: str
