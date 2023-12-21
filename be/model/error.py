@@ -11,8 +11,8 @@ error_code = {
     519: "not sufficient funds, order id {}",
     520: "missing args: {}",
     521: "error args: {}",
-    522: "",
-    523: "",
+    522: "store ownership error: {}",
+    523: "status error: {}",
     524: "",
     525: "",
     526: "",
@@ -61,6 +61,12 @@ def error_missing_args(arg):
 
 def error_args(arg):
     return 521, error_code[521].format(arg)
+
+def error_store_ownership(seller_id):
+    return 522, error_code[522].format(seller_id)
+
+def error_status(order_id):
+    return 523, error_code[523].format(order_id)
 
 def error_authorization_fail():
     return 401, error_code[401]

@@ -1,12 +1,13 @@
 import psycopg2
 from be.model import error
-from be.model import db_conn
+from be.model import db_conn, user
 import json
 from be.model.utils import cut
 
 class Seller(db_conn.DBConn):
     def __init__(self):
         db_conn.DBConn.__init__(self)
+        self.User = user.User()
 
     def add_book(
         self,
@@ -114,3 +115,35 @@ class Seller(db_conn.DBConn):
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
+
+    def send(self, user_id:str, order_id:str, token: str):
+        try:
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id)
+            # code, message = self.User.check_token(user_id, token)
+            # if code != 200:
+            #     return code, message
+            self.cursor.execute(
+                'SELECT store_id, status FROM "order" WHERE order_id = %s', (order_id,)
+            )
+            res_order = self.cursor.fetchone()
+            if res_order is None:
+                return error.error_invalid_order_id(order_id)
+            store_id = res_order[0]
+            if store_id is None:
+                return error.error_invalid_order_id(order_id+" order_id without store_id.")
+            status = res_order[1]
+            if status != 1:
+                return error.error_status(order_id)
+            self.cursor.execute(
+                'UPDATE "order" SET status = 2 WHERE order_id = %s', (order_id,)
+            )
+            self.database.commit()
+        except psycopg2.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e))
+        except BaseException as e:
+            return 530, "{}".format(str(e))
+        return 200, "ok"
+    
+    
