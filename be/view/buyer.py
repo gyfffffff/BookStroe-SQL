@@ -73,7 +73,7 @@ def receive():
     order_id: str = data.get("order_id")
     token: str = request.headers.get("token")
     b = Buyer()
-    code, message = b.receive(user_id, order_id)
+    code, message = b.receive(user_id, order_id, token)
     return jsonify({"message": message}), code
 
 @bp_buyer.route("/search_order", methods=["POST"])

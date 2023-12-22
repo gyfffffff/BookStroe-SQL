@@ -28,7 +28,7 @@ class Store:
 
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS bookstore("
-                "user_id TEXT, store_id TEXT, PRIMARY KEY(user_id, store_id));"
+                "store_id TEXT, user_id TEXT, PRIMARY KEY(store_id));"
             )
 
             cursor.execute(

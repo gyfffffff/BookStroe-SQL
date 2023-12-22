@@ -18,8 +18,8 @@ class DBConn:
 
     def book_id_exist(self, store_id, book_id):
         cursor = self.cursor.execute(
-            "SELECT book_id FROM store WHERE store_id = %s AND book_id = %s;",
-            (store_id, book_id),
+            "SELECT book_id FROM store WHERE book_id = %s AND store_id = %s;",
+            (book_id, store_id),
         )
         
         row = self.cursor.fetchone()
@@ -37,3 +37,5 @@ class DBConn:
             return False
         else:
             return True
+        
+    

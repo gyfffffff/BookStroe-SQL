@@ -31,6 +31,7 @@ class Seller(db_conn.DBConn):
                 "SELECT * FROM book WHERE id = %s", (book_id,)
             )
             if self.cursor.fetchone() is None: 
+                tsvec = cut(book_info)   # 返回一个空格分割的字符串
                 self.cursor.execute(
                     'INSERT into book(id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
                     'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
@@ -51,14 +52,8 @@ class Seller(db_conn.DBConn):
                         book_info['content'], 
                         book_info['tags'], 
                         book_info['pictures'], 
+                        tsvec
                     ),
-                )
-                # 分词
-                tsvec = cut(book_info)   # 返回一个空格分割的字符串
-                self.cursor.execute(
-                    'update book set _ts=%s '
-                    'where id = %s',
-                    (tsvec, book_id)
                 )
 
             self.cursor.execute(
@@ -87,8 +82,8 @@ class Seller(db_conn.DBConn):
 
             self.cursor.execute(
                 "UPDATE store SET stock_level = stock_level + %s "
-                "WHERE store_id = %s AND book_id = %s",
-                (add_stock_level, store_id, book_id),
+                "WHERE book_id = %s AND store_id = %s",
+                (add_stock_level, book_id, store_id),
             )
             self.database.commit()
         except psycopg2.Error as e:
@@ -105,8 +100,8 @@ class Seller(db_conn.DBConn):
             if self.store_id_exist(store_id):
                 return error.error_exist_store_id(store_id)
             self.cursor.execute(
-                'INSERT into bookstore(user_id, store_id) VALUES (%s, %s)',
-                (user_id, store_id),
+                'INSERT into bookstore(store_id, user_id) VALUES (%s, %s)',
+                (store_id, user_id),
             )
             self.database.commit()
         except psycopg2.Error as e:
@@ -118,8 +113,9 @@ class Seller(db_conn.DBConn):
 
     def send(self, user_id:str, order_id:str, token: str):
         try:
-            if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id)
+            code, message = self.User.check_token(user_id, token)
+            if code != 200:
+                return code, message
             self.cursor.execute(
                 'SELECT store_id, status FROM "order" WHERE order_id = %s', (order_id,)
             )
