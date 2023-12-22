@@ -304,3 +304,54 @@ class Buyer(db_conn.DBConn):
             self.database.rollback()
             return 530, "{}".format(str(e)), ""
         return 200, 'ok', result
+    
+    def delete_order(self, user_id, order_id):
+        try:
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id)
+            self.cursor.execute(
+                'select status, price, store_id from "order" where order_id = %s;', (order_id,)
+            )
+            res = self.cursor.fetchone()
+            state = int(res[0])
+            total_price = res[1]
+            store_id = res[2]
+            if 1<= state <= 3:  # 已付款
+                self.cursor.execute(
+                    'UPDATE "user" set balance = balance + %s WHERE user_id = %s;', (total_price, user_id)
+                )
+                self.database.commit()
+            self.cursor.execute(
+                'select book_id,count from order_book where order_id = %s;', (order_id,)
+            )
+            book_count = self.cursor.fetchall()
+            for book_id, count in book_count:
+                self.cursor.execute(
+                    'update store set stock_level = stock_level + %s where book_id = %s and store_id = %s;', (count, book_id, store_id)
+                )
+            self.cursor.execute(
+                'update "order" set status = 4 WHERE order_id = %s;', (order_id,)
+            )
+            self.database.commit()
+        except psycopg2.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e))
+        except BaseException as e:
+            self.database.rollback()
+            return 530, "{}".format(str(e))
+        return 200, 'ok'
+    
+    def delete_order_time(self):
+        # 删除超时未支付订单
+        try:
+            now = self.get_current_time()
+            self.cursor.execute(
+                'update "order" set status = 4 WHERE status = 0 and pay_ddl < %s;', (now,)
+            )
+            self.database.commit()
+        except psycopg2.Error as e:
+            self.database.rollback()
+            return 528, "{}".format(str(e))
+        except BaseException as e:
+            self.database.rollback()
+            return 530, "{}".format(str(e))

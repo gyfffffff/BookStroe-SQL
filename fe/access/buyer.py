@@ -86,3 +86,15 @@ class Buyer:
         print(8686, r.json().get("results"))
         return r.status_code, r.json().get("results")
     
+    def delete_order(self, order_id: str) -> int:
+        json = {
+            "user_id": self.user_id,
+            "order_id": order_id,
+        }
+        print(9494, json)
+        url = urljoin(self.url_prefix, "delete_order")
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        print(9797, r.text)
+        return r.status_code
+    
