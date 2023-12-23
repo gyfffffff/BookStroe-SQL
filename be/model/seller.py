@@ -93,10 +93,11 @@ class Seller(db_conn.DBConn):
             return 530, "{}".format(str(e))
         return 200, "ok"
 
-    def create_store(self, user_id: str, store_id: str) -> (int, str):
+    def create_store(self, user_id: str, store_id: str, token: str) -> (int, str):
         try:
-            if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id)
+            code, message = self.User.check_token(user_id, token)
+            if code != 200:
+                return code, message
             if self.store_id_exist(store_id):
                 return error.error_exist_store_id(store_id)
             self.cursor.execute(
@@ -117,15 +118,13 @@ class Seller(db_conn.DBConn):
             if code != 200:
                 return code, message
             self.cursor.execute(
-                'SELECT store_id, status FROM "order" WHERE order_id = %s', (order_id,)
+                'SELECT status FROM "order" WHERE order_id = %s', (order_id,)
             )
             res_order = self.cursor.fetchone()
             if res_order is None:
                 return error.error_invalid_order_id(order_id)
-            store_id = res_order[0]
-            if store_id is None:
-                return error.error_invalid_order_id(order_id+" order_id without store_id.")
-            status = res_order[1]
+            # store_id = res_order[0]
+            status = res_order[0]
             if status != 1:
                 return error.error_status(order_id)
             self.cursor.execute(

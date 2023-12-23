@@ -53,16 +53,27 @@ class Buyer:
         return r.status_code
     
     def search_global(self, key: str, pageIndex: int = 1, pageSize: int = 5) -> int:
-        url = urljoin(self.url_prefix, "search_global")+f"?key={key}&pageIndex={str(pageIndex)}&pageSize={str(pageSize)}"
+        json = {
+            "key": key,
+            "pageIndex": pageIndex,
+            "pageSize": pageSize,
+        }
+        print(6161, json)
+        url = urljoin(self.url_prefix, "search_global")
         headers = {"token": self.token}
-        # print(5858, url)
-        r = requests.get(url, headers=headers)      
+        r = requests.post(url, headers=headers, json=json)      
         return r.status_code
     
     def search_store(self, key: str, store_id: str, pageIndex: int = 1, pageSize: int = 5) -> int:
-        url = urljoin(self.url_prefix, "search_store")+f"?key={key}&store_id={store_id}&pageIndex={str(pageIndex)}&pageSize={str(pageSize)}"
+        json = {
+            "key": key,
+            "store_id": store_id,
+            "pageIndex": pageIndex,
+            "pageSize": pageSize,
+        }
+        url = urljoin(self.url_prefix, "search_store")
         headers = {"token": self.token}
-        r = requests.get(url, headers=headers)
+        r = requests.post(url, headers=headers, json=json)
         return r.status_code
     
     def receive(self, order_id: str) -> int:

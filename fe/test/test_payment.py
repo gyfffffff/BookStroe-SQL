@@ -52,9 +52,16 @@ class TestPayment:
     def test_authorization_error(self):
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
-        self.buyer.password = self.buyer.password + "_x"
+        self.buyer.user_id += "_x"
         code = self.buyer.payment(self.order_id)
-        assert code != 200
+        assert code == 401
+
+    def test_authorization_error2(self):
+        code = self.buyer.add_funds(self.total_price)
+        assert code == 200
+        self.buyer.password += "_x"
+        code = self.buyer.payment(self.order_id)
+        assert code == 401
 
     def test_not_suff_funds(self):
         code = self.buyer.add_funds(self.total_price - 1)
@@ -70,3 +77,10 @@ class TestPayment:
 
         code = self.buyer.payment(self.order_id)
         assert code != 200
+
+    def test_invalid_order(self):
+        code = self.buyer.add_funds(self.total_price)
+        assert code == 200
+        code = self.buyer.payment(self.order_id+"_x")
+        assert code != 200  
+

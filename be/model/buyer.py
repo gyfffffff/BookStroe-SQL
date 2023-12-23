@@ -53,8 +53,6 @@ class Buyer(db_conn.DBConn):
                     "WHERE store_id = %s and book_id = %s and stock_level >= %s; ",
                     (count, store_id, book_id, count),
                 )
-                if self.cursor.rowcount == 0:
-                    return error.error_stock_level_low(book_id) + (order_id,)
             
                 order_price += count * price
                 self.cursor.execute(
@@ -105,8 +103,6 @@ class Buyer(db_conn.DBConn):
                 'SELECT balance, password FROM "user" WHERE user_id = %s;', (buyer_id,)
             )
             row = self.cursor.fetchone()
-            if row is None:
-                return error.error_non_exist_user_id(buyer_id)
             balance = row[0]
             if password != row[1]:
                 return error.error_authorization_fail()
@@ -116,13 +112,9 @@ class Buyer(db_conn.DBConn):
                 (store_id,),
             )
             row = self.cursor.fetchone()
-            if row is None:
-                return error.error_non_exist_store_id(store_id)
 
             seller_id = row[0]
 
-            if not self.user_id_exist(seller_id):
-                return error.error_non_exist_user_id(seller_id)
 
             if balance < total_price:
                 return error.error_not_sufficient_funds(order_id)
@@ -132,22 +124,15 @@ class Buyer(db_conn.DBConn):
                 "WHERE user_id = %s AND balance >= %s",
                 (total_price, buyer_id, total_price),
             )
-            if self.cursor.rowcount == 0:
-                return error.error_not_sufficient_funds(order_id)
 
             conn.execute(
                 'UPDATE "user" set balance = balance + %s WHERE user_id = %s',
                 (total_price, seller_id),
             )
 
-            if self.cursor.rowcount == 0:
-                return error.error_non_exist_user_id(buyer_id)
-
             conn.execute(
                 'UPDATE "order" set status = 1 WHERE order_id = %s', (order_id,)
             )
-            if self.cursor.rowcount == 0:
-                return error.error_invalid_order_id(order_id)
 
             self.database.commit()
 
@@ -191,9 +176,9 @@ class Buyer(db_conn.DBConn):
             if not key:
                 return error.error_missing_args("key")
             try:
-                if pageIndex == "None" or int(pageIndex) < 1:
+                if pageIndex is None or int(pageIndex) < 1:
                     pageIndex = 1
-                if pageSize == "None" or int(pageSize) < 1:
+                if pageSize is None or int(pageSize) < 1:
                     pageSize = 5
             except:
                 return error.error_args("invalid pageIndex or pageSize")
@@ -223,9 +208,9 @@ class Buyer(db_conn.DBConn):
             if not self.store_id_exist(store_id):
                 return error.error_non_exist_store_id(store_id) + ("",)
             try:
-                if pageIndex == "None" or int(pageIndex) < 1:
+                if pageIndex is None or int(pageIndex) < 1:
                     pageIndex = 1
-                if pageSize == "None" or int(pageSize) < 1:
+                if pageSize is None or int(pageSize) < 1:
                     pageSize = 5
             except:
                 return error.error_args("invalid pageIndex or pageSize") + ("",)

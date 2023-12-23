@@ -55,3 +55,10 @@ class TestSearchGlobal:
         pageSize = random.randint(2,6)
         status = self.buyer.search_global(keyword, pageIndex=pageIndex, pageSize=pageSize)  
         assert status != 200
+
+    def test_error_missing_key(self):
+        keyword = None
+        pageIndex = random.randint(2,6)
+        pageSize = random.randint(2,6)
+        status = self.buyer.search_global(keyword, pageIndex=pageIndex, pageSize=pageSize)  
+        assert status != 200

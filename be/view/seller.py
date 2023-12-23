@@ -11,8 +11,9 @@ bp_seller = Blueprint("seller", __name__, url_prefix="/seller")
 def seller_create_store():
     user_id: str = request.json.get("user_id")
     store_id: str = request.json.get("store_id")
+    token: str = request.headers.get("token")
     s = seller.Seller()
-    code, message = s.create_store(user_id, store_id)
+    code, message = s.create_store(user_id, store_id, token)
     return jsonify({"message": message}), code
 
 

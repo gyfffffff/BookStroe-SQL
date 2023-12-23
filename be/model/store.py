@@ -39,6 +39,9 @@ class Store:
                 "content TEXT,tags TEXT,picture TEXT, _ts tsvector, "
                 "PRIMARY KEY(book_id));"
             )
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS book_ts_idx ON book USING gin(_ts);"
+            )
 
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS store( "

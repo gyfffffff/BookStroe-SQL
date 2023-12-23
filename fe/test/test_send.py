@@ -5,6 +5,7 @@ from fe.access.buyer import Buyer
 from fe.access.seller import Seller
 import uuid
 from fe.test.gen_book_data import GenBook
+from fe import conf
 
 class TestSend:
     seller_id: str
@@ -39,10 +40,11 @@ class TestSend:
         for item in self.buy_book_info_list:
             book: Book = item[0]
             num = item[1]
-            if book.price is None:
-                continue
-            else:
-                self.total_price = self.total_price + book.price * num
+            book.price = 0 if book.price is None else book.price
+            # if book.price is None:
+            #     continue
+            # else:
+            self.total_price = self.total_price + book.price * num
         self.buyer.add_funds(self.total_price)
         assert code == 200
         self.buyer.payment(order_id=self.order_id)
@@ -50,26 +52,27 @@ class TestSend:
         yield
 
     def test_ok(self):
-        self.seller = Seller("http://localhost:5000/", self.seller_id, self.password)
+        self.seller = Seller(conf.URL, self.seller_id, self.password)
         code = self.seller.send(self.seller_id, self.order_id)
         assert code == 200
     
-    def test_error_non_exist_user_id(self):
-        self.seller = Seller("http://localhost:5000/", self.seller_id, self.password)
-        code = self.seller.send(self.seller_id + "_x", self.order_id)
+    def test_error_token(self):
+        self.seller = Seller(conf.URL, self.seller_id, self.password)
+        self.seller.token = self.seller.token + "_x"
+        code = self.seller.send(self.seller_id, self.order_id)
         assert code != 200
     
-    def error_invalid_order_id(self):
-        self.seller = Seller("http://localhost:5000/", self.seller_id, self.password)
+    def test_error_invalid_order_id(self):
+        self.seller = Seller(conf.URL, self.seller_id, self.password)
         code = self.seller.send(self.seller_id, self.order_id + "_x")
         assert code != 200
 
-    def error_status(self):
-        self.seller = Seller("http://localhost:5000/", self.seller_id, self.password)
+    def test_error_status(self):
+        self.seller = Seller(conf.URL, self.seller_id, self.password)
         code = self.seller.send(self.seller_id, self.order_id)
         assert code == 200
         code = self.seller.send(self.seller_id, self.order_id)
-        assert code != 200
+        assert code == 523
     
     
         
