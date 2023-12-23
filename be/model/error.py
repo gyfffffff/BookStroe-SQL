@@ -17,7 +17,7 @@ error_code = {
     525: "",
     526: "",
     527: "",
-    528: "",
+    528: "数据库操作出错，请检查您提供的用户、商店或订单是否存在, 或要插入的书籍是否已经存在于商店中",
 }
 
 
@@ -33,16 +33,16 @@ def error_non_exist_store_id(store_id):
     return 513, error_code[513].format(store_id)
 
 
-def error_exist_store_id(store_id):
-    return 514, error_code[514].format(store_id)
+# def error_exist_store_id(store_id):
+#     return 514, error_code[514].format(store_id)
 
 
 def error_non_exist_book_id(book_id):
     return 515, error_code[515].format(book_id)
 
 
-def error_exist_book_id(book_id):
-    return 516, error_code[516].format(book_id)
+# def error_exist_book_id(book_id):
+#     return 516, error_code[516].format(book_id)
 
 
 def error_stock_level_low(book_id):
@@ -68,6 +68,8 @@ def error_status(order_id):
 def error_authorization_fail():
     return 401, error_code[401]
 
+def error_database(e):
+    return 528, str(e)+error_code[528]
 
 def error_and_message(code, message):
     return code, message

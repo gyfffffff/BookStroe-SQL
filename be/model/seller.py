@@ -21,10 +21,10 @@ class Seller(db_conn.DBConn):
         try:
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id)
-            if not self.store_id_exist(store_id):
-                return error.error_non_exist_store_id(store_id)
-            if self.book_id_exist(store_id, book_id):
-                return error.error_exist_book_id(book_id)
+            # if not self.store_id_exist(store_id):
+            #     return error.error_non_exist_store_id(store_id)
+            # if self.book_id_exist(store_id, book_id):
+            #     return error.error_exist_book_id(book_id)
 
             book_info = json.loads(book_json_str)
 
@@ -62,7 +62,7 @@ class Seller(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
@@ -86,7 +86,7 @@ class Seller(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
@@ -96,8 +96,8 @@ class Seller(db_conn.DBConn):
             code, message = self.User.check_token(user_id, token)
             if code != 200:
                 return error.error_and_message(code, message)
-            if self.store_id_exist(store_id):
-                return error.error_exist_store_id(store_id)
+            # if self.store_id_exist(store_id):
+            #     return error.error_exist_store_id(store_id)
             self.cursor.execute(
                 "INSERT into bookstore(store_id, user_id) VALUES (%s, %s)",
                 (store_id, user_id),
@@ -105,7 +105,7 @@ class Seller(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
@@ -131,7 +131,7 @@ class Seller(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"

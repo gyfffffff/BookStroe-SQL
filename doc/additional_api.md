@@ -37,7 +37,7 @@ POST /seller/send
 
 卖家发货
 
-> Body 请求参数
+> Body Parameters
 
 ```json
 {
@@ -46,16 +46,16 @@ POST /seller/send
 }
 ```
 
-### 请求参数
+### Params
 
-|名称|位置|类型|必选|说明|
+|Name|Location|Type|Required|Description|
 |---|---|---|---|---|
-|token|header|string| 否 |用户token|
-|body|body|object| 否 |none|
-|» user_id|body|string| 是 |卖家ID|
-|» order_id|body|string| 是 |要发货的订单ID|
+|token|header|string| no |用户token|
+|body|body|object| no |none|
+|» user_id|body|string| yes |卖家ID|
+|» order_id|body|string| yes |要发货的订单ID|
 
-> 返回示例
+> Response Examples
 
 > 200 Response
 
@@ -63,16 +63,16 @@ POST /seller/send
 {}
 ```
 
-### 返回结果
+### Responses
 
-|状态码|状态码含义|说明|数据模型|
+|HTTP Status Code |Meaning|Description|Data schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
 |518|Unknown|无效订单|Inline|
 |528|Unknown|数据库错误|Inline|
 |530|Unknown|其他错误|Inline|
 
-### 返回数据结构
+### Responses Data Schema
 
 # 后40%/buyer
 
@@ -82,15 +82,15 @@ POST /buyer/search_global
 
 根据传入的关键词进行全局的图书搜索，支持传入多个关键词和分页。
 
-### 请求参数
+### Params
 
-|名称|位置|类型|必选|说明|
+|Name|Location|Type|Required|Description|
 |---|---|---|---|---|
-|key|query|string| 是 |搜索的关键词|
-|pageIndex|query|integer| 否 |>0的整数，表示第几页|
-|pageSize|query|integer| 否 |>0的整数，表示每页有几条数据|
+|key|query|string| yes |搜索的关键词|
+|pageIndex|query|integer| no |>0的整数，表示第几页|
+|pageSize|query|integer| no |>0的整数，表示每页有几条数据|
 
-> 返回示例
+> Response Examples
 
 > 200 Response
 
@@ -98,16 +98,16 @@ POST /buyer/search_global
 {}
 ```
 
-### 返回结果
+### Responses
 
-|状态码|状态码含义|说明|数据模型|
+|HTTP Status Code |Meaning|Description|Data schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
 |520|Unknown|缺少参数key|Inline|
 |521|Unknown|无效的pageIndex或pageSize|Inline|
 |530|Unknown|其他错误|Inline|
 
-### 返回数据结构
+### Responses Data Schema
 
 ## POST search_store
 
@@ -115,16 +115,16 @@ POST /buyer/search_store
 
 根据传入的关键词和书店ID进行店内图书搜索，支持传入多个关键词和分页。
 
-### 请求参数
+### Params
 
-|名称|位置|类型|必选|说明|
+|Name|Location|Type|Required|Description|
 |---|---|---|---|---|
-|key|query|string| 是 |搜索的关键词|
-|pageIndex|query|integer| 否 |>0的整数，表示第几页|
-|pageSize|query|integer| 否 |>0的整数，表示每页有几条数据|
-|store_id|query|string| 否 |书店ID|
+|key|query|string| yes |搜索的关键词|
+|pageIndex|query|integer| no |>0的整数，表示第几页|
+|pageSize|query|integer| no |>0的整数，表示每页有几条数据|
+|store_id|query|string| no |书店ID|
 
-> 返回示例
+> Response Examples
 
 > 200 Response
 
@@ -132,16 +132,16 @@ POST /buyer/search_store
 {}
 ```
 
-### 返回结果
+### Responses
 
-|状态码|状态码含义|说明|数据模型|
+|HTTP Status Code |Meaning|Description|Data schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
 |520|Unknown|缺少参数key|Inline|
 |521|Unknown|无效的pageIndex或pageSize|Inline|
 |530|Unknown|其他错误|Inline|
 
-### 返回数据结构
+### Responses Data Schema
 
 ## POST delete_order
 
@@ -149,7 +149,7 @@ POST /buyer/delete_order
 
 手动删除订单
 
-> Body 请求参数
+> Body Parameters
 
 ```json
 {
@@ -158,15 +158,15 @@ POST /buyer/delete_order
 }
 ```
 
-### 请求参数
+### Params
 
-|名称|位置|类型|必选|说明|
+|Name|Location|Type|Required|Description|
 |---|---|---|---|---|
-|body|body|object| 否 |none|
-|» user_id|body|string| 是 |用户ID|
-|» order_id|body|string| 是 |要删除的订单ID|
+|body|body|object| no |none|
+|» user_id|body|string| yes |用户ID|
+|» order_id|body|string| yes |要删除的订单ID|
 
-> 返回示例
+> Response Examples
 
 > 200 Response
 
@@ -174,16 +174,16 @@ POST /buyer/delete_order
 {}
 ```
 
-### 返回结果
+### Responses
 
-|状态码|状态码含义|说明|数据模型|
+|HTTP Status Code |Meaning|Description|Data schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|认证失败|Inline|
 |528|Unknown|数据库错误|Inline|
 |530|Unknown|其他错误|Inline|
 
-### 返回数据结构
+### Responses Data Schema
 
 ## POST 搜索订单
 
@@ -191,7 +191,7 @@ POST /buyer/search_order
 
 搜索历史订单
 
-> Body 请求参数
+> Body Parameters
 
 ```json
 {
@@ -200,15 +200,15 @@ POST /buyer/search_order
 }
 ```
 
-### 请求参数
+### Params
 
-|名称|位置|类型|必选|说明|
+|Name|Location|Type|Required|Description|
 |---|---|---|---|---|
-|body|body|object| 否 |none|
-|» buyer_id|body|string| 是 |买家ID|
-|» search_state|body|string| 是 |搜索的订单状态；-1：全部订单， 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 4: 已取消|
+|body|body|object| no |none|
+|» buyer_id|body|string| yes |买家ID|
+|» search_state|body|string| yes |搜索的订单状态；-1：全部订单， 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 4: 已取消|
 
-> 返回示例
+> Response Examples
 
 > 200 Response
 
@@ -216,16 +216,16 @@ POST /buyer/search_order
 {}
 ```
 
-### 返回结果
+### Responses
 
-|状态码|状态码含义|说明|数据模型|
+|HTTP Status Code |Meaning|Description|Data schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
 |511|[Network Authentication Required](https://tools.ietf.org/html/rfc6585#section-6)|用户不存在|Inline|
 |528|Unknown|数据库错误|Inline|
 |530|Unknown|其他错误|Inline|
 
-### 返回数据结构
+### Responses Data Schema
 
 ## POST 收货
 
@@ -233,7 +233,7 @@ POST /buyer/receive
 
 用户收货
 
-> Body 请求参数
+> Body Parameters
 
 ```json
 {
@@ -243,16 +243,16 @@ POST /buyer/receive
 }
 ```
 
-### 请求参数
+### Params
 
-|名称|位置|类型|必选|说明|
+|Name|Location|Type|Required|Description|
 |---|---|---|---|---|
-|body|body|object| 否 |none|
-|» user_id|body|string| 是 |买家ID|
-|» order_id|body|string| 是 |要收货的订单ID|
-|» token|body|string| 是 |用户token|
+|body|body|object| no |none|
+|» user_id|body|string| yes |买家ID|
+|» order_id|body|string| yes |要收货的订单ID|
+|» token|body|string| yes |用户token|
 
-> 返回示例
+> Response Examples
 
 > 200 Response
 
@@ -260,16 +260,16 @@ POST /buyer/receive
 {}
 ```
 
-### 返回结果
+### Responses
 
-|状态码|状态码含义|说明|数据模型|
+|HTTP Status Code |Meaning|Description|Data schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|认证失败|Inline|
 |528|Unknown|数据库错误|Inline|
 |530|Unknown|其他错误|Inline|
 
-### 返回数据结构
+### Responses Data Schema
 
-# 数据模型
+# Data Schema
 

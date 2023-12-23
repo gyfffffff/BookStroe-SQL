@@ -58,7 +58,7 @@ class User(db_conn.DBConn):
             terminal = "terminal_{}".format(str(time.time()))
             token = jwt_encode(user_id, terminal)
             sql = 'INSERT into "user"(user_id, password, balance, token, terminal) VALUES (%s, %s, %s, %s, %s);'
-            self.cursor.execute(sql,(user_id, password, 0, token, terminal))
+            self.cursor.execute(sql, (user_id, password, 0, token, terminal))
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
@@ -93,7 +93,7 @@ class User(db_conn.DBConn):
         try:
             code, message = self.check_password(user_id, password)
             if code != 200:
-                return error.error_and_message(code, message)+("",)
+                return error.error_and_message(code, message) + ("",)
 
             token = jwt_encode(user_id, terminal)
             cursor = self.cursor.execute(
@@ -103,7 +103,7 @@ class User(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e)), ""
+            return error.error_database(e), ""
         except BaseException as e:
             return 530, "{}".format(str(e)), ""
         return 200, "ok", token
@@ -121,13 +121,13 @@ class User(db_conn.DBConn):
                 'UPDATE "user" SET token = %s, terminal = %s WHERE user_id=%s',
                 (dummy_token, terminal, user_id),
             )
-            if self.cursor.rowcount == 0:
-                return error.error_authorization_fail()
+            # if self.cursor.rowcount == 0:
+            #     return error.error_authorization_fail()
 
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
@@ -144,7 +144,7 @@ class User(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
@@ -167,7 +167,7 @@ class User(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"

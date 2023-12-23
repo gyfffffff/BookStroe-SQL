@@ -34,48 +34,6 @@ class Store:
                     sql_commands = file.read()
                 cursor.execute(sql_commands)
 
-            # cursor.execute(
-            #     "CREATE TABLE IF NOT EXISTS bookstore("
-            #     "store_id TEXT, user_id TEXT, PRIMARY KEY(store_id));"
-            # )
-
-            # cursor.execute(
-            #     "CREATE TABLE IF NOT EXISTS book( "
-            #     "id TEXT, title TEXT, publisher TEXT, author TEXT,"
-            #     "original_title TEXT, translator TEXT, pub_year TEXT,pages INTEGER,"
-            #     "currency_unit TEXT,binding TEXT,isbn TEXT,author_intro TEXT,book_intro text,"
-            #     "content TEXT,tags TEXT,picture TEXT, _ts tsvector, "
-            #     "PRIMARY KEY(id));"
-            # )
-            # cursor.execute(
-            #     "CREATE INDEX IF NOT EXISTS book_ts_idx ON book USING gin(_ts);"
-            # )
-
-            # cursor.execute(
-            #     "CREATE TABLE IF NOT EXISTS store( "
-            #     "book_id TEXT, store_id TEXT, stock_level INTEGER, price INTEGER, "
-            #     "PRIMARY KEY(book_id, store_id))"
-            # )
-
-            # cursor.execute(
-            #     """CREATE TABLE IF NOT EXISTS "order"( 
-            #     order_id TEXT, user_id TEXT, store_id TEXT, create_time DATE, pay_ddl DATE,status INTEGER, price INTEGER,  
-            #     PRIMARY KEY(order_id));"""
-            # )
-
-            # cursor.execute(
-            #     "CREATE TABLE IF NOT EXISTS order_book( "
-            #     "order_id TEXT, book_id TEXT, count INTEGER, "
-            #     "PRIMARY KEY(order_id, book_id))"
-            # )
-
-            # cursor.execute(
-            #     'ALTER TABLE order_book ADD CONSTRAINT order_book_fk FOREIGN KEY (book_id) REFERENCES book(id);'
-            # )
-
-            # cursor.execute(
-            #     'ALTER TABLE order_book ADD CONSTRAINT order_book_fk2 FOREIGN KEY (order_id) REFERENCES public."order"(order_id) ON DELETE CASCADE ON UPDATE CASCADE;'
-            # )
 
             self.database.commit()
         except Exception as e:

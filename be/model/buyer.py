@@ -26,10 +26,10 @@ class Buyer(db_conn.DBConn):
     ) -> (int, str, str):
         order_id = ""
         try:
-            if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id) + (order_id,)
-            if not self.store_id_exist(store_id):
-                return error.error_non_exist_store_id(store_id) + (order_id,)
+            # if not self.user_id_exist(user_id):
+            #     return error.error_non_exist_user_id(user_id) + (order_id,)
+            # if not self.store_id_exist(store_id):
+            #     return error.error_non_exist_store_id(store_id) + (order_id,)
             uid = "{}_{}_{}".format(user_id, store_id, str(uuid.uuid1()))
 
             order_price = 0
@@ -77,7 +77,7 @@ class Buyer(db_conn.DBConn):
             order_id = uid
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e)), ""
+            return error.error_database(e)+("",)
         except BaseException as e:
             return 530, "{}".format(str(e)), ""
 
@@ -91,8 +91,8 @@ class Buyer(db_conn.DBConn):
                 (order_id,),
             )
             row = self.cursor.fetchone()
-            if row is None:
-                return error.error_invalid_order_id(order_id)
+            # if row is None:
+            #     return error.error_invalid_order_id(order_id)
 
             order_id = row[0]
             buyer_id = row[1]
@@ -103,7 +103,7 @@ class Buyer(db_conn.DBConn):
                 return error.error_authorization_fail()
 
             conn.execute(
-                'SELECT balance, password FROM "user" WHERE user_id = %s;', (buyer_id,)
+                'SELECT balance, password FROM "user" WHERE user_id = %s;', (user_id,)
             )
             row = self.cursor.fetchone()
             balance = row[0]
@@ -124,7 +124,7 @@ class Buyer(db_conn.DBConn):
             conn.execute(
                 'UPDATE "user" set balance = balance - %s '
                 "WHERE user_id = %s AND balance >= %s",
-                (total_price, buyer_id, total_price),
+                (total_price, user_id, total_price),
             )
 
             conn.execute(
@@ -139,7 +139,7 @@ class Buyer(db_conn.DBConn):
             self.database.commit()
 
         except psycopg2.Error as e:
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
 
@@ -164,7 +164,7 @@ class Buyer(db_conn.DBConn):
 
             self.database.commit()
         except psycopg2.Error as e:
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
 
@@ -192,7 +192,7 @@ class Buyer(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e)), ""
+            return error.error_database(e), ""
         except BaseException as e:
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
@@ -222,7 +222,7 @@ class Buyer(db_conn.DBConn):
             result = self.cursor.fetchall()
             self.database.commit()
         except psycopg2.Error as e:
-            return 528, "{}".format(str(e)), ""
+            return error.error_database(e), ""
         except BaseException as e:
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
@@ -248,15 +248,15 @@ class Buyer(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
 
     def search_order(self, user_id, search_state):
         try:
-            if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id) + ("",)
+            # if not self.user_id_exist(user_id):
+            #     return error.error_non_exist_user_id(user_id) + ("",)
             if search_state == -1:
                 self.cursor.execute(
                     'SELECT * FROM "order" WHERE user_id = %s', (user_id,)
@@ -267,10 +267,11 @@ class Buyer(db_conn.DBConn):
                     (user_id, search_state),
                 )
             result = self.cursor.fetchall()
+            assert len(result) > 0
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e)), ""
+            return error.error_database(e), ""
         except BaseException as e:
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
@@ -281,8 +282,8 @@ class Buyer(db_conn.DBConn):
         order_id,
     ):
         try:
-            if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id)
+            # if not self.user_id_exist(user_id):
+            #     return error.error_non_exist_user_id(user_id)
             self.cursor.execute(
                 'select status, price, store_id from "order" where order_id = %s;',
                 (order_id,),
@@ -291,10 +292,19 @@ class Buyer(db_conn.DBConn):
             state = int(res[0])
             total_price = res[1]
             store_id = res[2]
+            self.cursor.execute(
+                "select user_id from bookstore where store_id = %s;", (store_id,)
+            )
+            seller_id = self.cursor.fetchone()[0]
             if 1 <= state <= 3:  # 已付款
                 self.cursor.execute(
                     'UPDATE "user" set balance = balance + %s WHERE user_id = %s;',
                     (total_price, user_id),
+                )
+                assert self.cursor.rowcount == 1
+                self.cursor.execute(
+                    'UPDATE "user" set balance = balance - %s WHERE user_id = %s;',
+                    (total_price, seller_id),
                 )
             elif state == 4:
                 return 200, "ok"
@@ -313,7 +323,7 @@ class Buyer(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             self.database.rollback()
             return 530, "{}".format(str(e))
@@ -330,7 +340,7 @@ class Buyer(db_conn.DBConn):
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
-            return 528, "{}".format(str(e))
+            return error.error_database(e)
         except BaseException as e:
             self.database.rollback()
             return 530, "{}".format(str(e))

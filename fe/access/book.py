@@ -88,8 +88,8 @@ class BookDB:
                 if picture:
                     encode_str = base64.b64encode(picture).decode("utf-8")
                     book.pictures.append(encode_str)
-                else:
-                    pass
+                # else:
+                #     pass
             books.append(book)
             # print(tags.decode('utf-8'))
 
