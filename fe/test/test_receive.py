@@ -39,10 +39,11 @@ class TestReceive:
         for item in self.buy_book_info_list:
             book: Book = item[0]
             num = item[1]
-            if book.price is None:
-                continue
-            else:
-                self.total_price = self.total_price + book.price * num
+            book.price = 0 if book.price is None else book.price
+            # if book.price is None:
+            #     continue
+            # else:
+            self.total_price = self.total_price + book.price * num
         self.buyer.add_funds(self.total_price)
         assert code == 200
         self.buyer.payment(order_id=self.order_id)

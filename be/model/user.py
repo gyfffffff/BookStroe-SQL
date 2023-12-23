@@ -72,7 +72,7 @@ class User(db_conn.DBConn):
         row = self.cursor.fetchone()
         if row is None:
             return error.error_authorization_fail()
-        db_token = row[0]  
+        db_token = row[0]
         if not self.__check_token(user_id, db_token, token):
             return error.error_authorization_fail()
         return 200, "ok"
@@ -93,15 +93,13 @@ class User(db_conn.DBConn):
         try:
             code, message = self.check_password(user_id, password)
             if code != 200:
-                return code, message, ""
+                return error.error_and_message(code, message)+("",)
 
             token = jwt_encode(user_id, terminal)
             cursor = self.cursor.execute(
                 'UPDATE "user" set token= %s , terminal = %s where user_id = %s',
                 (token, terminal, user_id),
             )
-            if self.cursor.rowcount == 0:
-                return error.error_authorization_fail() + ("",)
             self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
@@ -114,7 +112,7 @@ class User(db_conn.DBConn):
         try:
             code, message = self.check_token(user_id, token)
             if code != 200:
-                return code, message
+                return error.error_and_message(code, message)
 
             terminal = "terminal_{}".format(str(time.time()))
             dummy_token = jwt_encode(user_id, terminal)
@@ -138,15 +136,12 @@ class User(db_conn.DBConn):
         try:
             code, message = self.check_password(user_id, password)
             if code != 200:
-                return code, message
+                return error.error_and_message(code, message)
 
             cursor = self.cursor.execute(
                 'DELETE from "user" where user_id=%s', (user_id,)
             )
-            if self.cursor.rowcount == 1:
-                self.database.commit()
-            else:
-                return error.error_authorization_fail()
+            self.database.commit()
         except psycopg2.Error as e:
             self.database.rollback()
             return 528, "{}".format(str(e))
@@ -160,7 +155,7 @@ class User(db_conn.DBConn):
         try:
             code, message = self.check_password(user_id, old_password)
             if code != 200:
-                return code, message
+                return error.error_and_message(code, message)
 
             terminal = "terminal_{}".format(str(time.time()))
             token = jwt_encode(user_id, terminal)
@@ -168,8 +163,6 @@ class User(db_conn.DBConn):
                 'UPDATE "user" set password = %s, token= %s , terminal = %s where user_id = %s',
                 (new_password, token, terminal, user_id),
             )
-            if self.cursor.rowcount == 0:
-                return error.error_authorization_fail()
 
             self.database.commit()
         except psycopg2.Error as e:

@@ -24,10 +24,9 @@ def cut_word(text):
         "...",
         "......",
     ]
-    if text != None:
-        text_cutted = jieba.cut(str(text))  # jieba
-        words = [word for word in text_cutted if word not in stopwords]
-        return words
+    text_cutted = jieba.cut(str(text))  # jieba
+    words = [word for word in text_cutted if word not in stopwords]
+    return words
 
 
 def gen_random_keyword():

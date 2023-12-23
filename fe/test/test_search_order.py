@@ -26,10 +26,11 @@ class TestSearchOrder:
         for item in buy_book_info_list:
             book: Book = item[0]
             num = item[1]
-            if book.price is None:
-                continue
-            else:
-                total_price = total_price + book.price * num
+            book.price = 0 if book.price is None else book.price
+            # if book.price is None:
+            #     continue
+            # else:
+            total_price = total_price + book.price * num
             code = self.seller.add_stock_level(self.seller_id, self.store_id, book.id, num*12)
             assert code==200
         for i in range(12):

@@ -3,3 +3,4 @@ __pycache__/
 .coverage
 be.db
 app.log
+fe/data/book_lx.db

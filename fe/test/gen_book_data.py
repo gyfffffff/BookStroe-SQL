@@ -45,10 +45,11 @@ class GenBook:
 
         for bk in book_id_exist:
             stock_level = book_id_stock_level[bk.id]
-            if stock_level > 1:
-                buy_num = random.randint(1, stock_level)
-            else:
-                buy_num = 0
+            # if stock_level > 1:
+            #     buy_num = random.randint(1, stock_level)
+            # else:
+            #     buy_num = 0
+            buy_num = random.randint(1, stock_level) if stock_level > 1 else 0
             # add a new pair
             if non_exist_book_id:
                 bk.id = bk.id + "_x"

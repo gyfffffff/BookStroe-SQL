@@ -5,6 +5,7 @@ from be.model import db_conn, user
 from be.model import error
 import jieba
 
+
 class Buyer(db_conn.DBConn):
     def __init__(self):
         db_conn.DBConn.__init__(self)
@@ -53,7 +54,7 @@ class Buyer(db_conn.DBConn):
                     "WHERE store_id = %s and book_id = %s and stock_level >= %s; ",
                     (count, store_id, book_id, count),
                 )
-            
+
                 order_price += count * price
                 self.cursor.execute(
                     "INSERT INTO order_book(order_id, book_id, count) "
@@ -61,7 +62,7 @@ class Buyer(db_conn.DBConn):
                     (uid, book_id, count),
                 )
             create_time = self.get_current_time()
-            pay_ddl = self.get_time_after_30_min() 
+            pay_ddl = self.get_time_after_30_min()
             status = 0  # 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 4: 已取消
             self.cursor.execute(
                 'INSERT INTO "order"(order_id, user_id, store_id, create_time, pay_ddl, status, price) '
@@ -115,7 +116,6 @@ class Buyer(db_conn.DBConn):
 
             seller_id = row[0]
 
-
             if balance < total_price:
                 return error.error_not_sufficient_funds(order_id)
 
@@ -160,8 +160,6 @@ class Buyer(db_conn.DBConn):
                 'UPDATE "user" SET balance = balance + %s WHERE user_id = %s',
                 (add_value, user_id),
             )
-            if self.cursor.rowcount == 0:
-                return error.error_non_exist_user_id(user_id)
 
             self.database.commit()
         except psycopg2.Error as e:
@@ -224,17 +222,15 @@ class Buyer(db_conn.DBConn):
             result = self.cursor.fetchall()
             self.database.commit()
         except psycopg2.Error as e:
-            self.database.rollback()
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
-            self.database.rollback()
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
 
     def receive(self, buyer_id, order_id, token):
         code, message = self.User.check_token(buyer_id, token)
         if code != 200:
-            return code, message
+            return error.error_and_message(code, message)
         try:
             self.cursor.execute(
                 'SELECT status, user_id FROM "order" WHERE order_id = %s', (order_id,)
@@ -246,8 +242,9 @@ class Buyer(db_conn.DBConn):
             if status != 2:
                 return error.error_invalid_order_id(order_id)
             user_id = row[1]
-            if user_id != buyer_id:
-                return error.error_invalid_order_id(order_id)
+            code, message = self.User.check_token(user_id, token)
+            if code != 200:
+                return error.error_and_message(code, message)
             self.cursor.execute(
                 'UPDATE "order" SET status = 3 WHERE order_id = %s', (order_id,)
             )
@@ -283,7 +280,11 @@ class Buyer(db_conn.DBConn):
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
 
-    def delete_order(self, user_id, order_id, ):
+    def delete_order(
+        self,
+        user_id,
+        order_id,
+    ):
         try:
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id)

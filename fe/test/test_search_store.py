@@ -31,10 +31,16 @@ class TestSearchInStore:
             assert code == 200
         
 
-    def test_page_0(self):
+    def test_pageIndex_0(self):
         keyword = gen_random_keyword()  # 生成4-9长度不等的中文短句
         pageIndex = 0
         status = self.buyer.search_store(keyword, self.store_id, pageIndex)
+        assert status == 200
+
+    def test_pageSiz_0(self):
+        keyword = gen_random_keyword()  # 生成4-9长度不等的中文短句
+        pageSize = 0
+        status = self.buyer.search_store(keyword, self.store_id, pageSize=pageSize)
         assert status == 200
 
     def test_page_not_0(self):
@@ -56,3 +62,9 @@ class TestSearchInStore:
         pageSize = random.randint(2,6)
         status = self.buyer.search_store(keyword, store_id= "fake_store_id", pageIndex=pageIndex, pageSize=pageSize)
         assert status == 513
+
+    def test_error_missing_key(self):
+        status = self.buyer.search_store(None, self.store_id, 1, 5)
+        assert status == 520
+        status = self.buyer.search_store("key", None, 1, 5)
+        assert status == 520       
