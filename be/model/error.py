@@ -62,9 +62,6 @@ def error_missing_args(arg):
 def error_args(arg):
     return 521, error_code[521].format(arg)
 
-def error_store_ownership(seller_id):
-    return 522, error_code[522].format(seller_id)
-
 def error_status(order_id):
     return 523, error_code[523].format(order_id)
 

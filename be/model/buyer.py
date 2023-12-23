@@ -77,10 +77,8 @@ class Buyer(db_conn.DBConn):
             order_id = uid
         except psycopg2.Error as e:
             self.database.rollback()
-            logging.info("528, {}".format(str(e)))
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
-            logging.info("530, {}".format(str(e)))
             return 530, "{}".format(str(e)), ""
 
         return 200, "ok", order_id
@@ -142,7 +140,6 @@ class Buyer(db_conn.DBConn):
 
         except psycopg2.Error as e:
             return 528, "{}".format(str(e))
-
         except BaseException as e:
             return 530, "{}".format(str(e))
 
@@ -197,7 +194,6 @@ class Buyer(db_conn.DBConn):
             self.database.rollback()
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
-            self.database.rollback()
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
 
@@ -246,9 +242,6 @@ class Buyer(db_conn.DBConn):
             if status != 2:
                 return error.error_invalid_order_id(order_id)
             user_id = row[1]
-            code, message = self.User.check_token(user_id, token)
-            if code != 200:
-                return error.error_and_message(code, message)
             self.cursor.execute(
                 'UPDATE "order" SET status = 3 WHERE order_id = %s', (order_id,)
             )
@@ -257,7 +250,6 @@ class Buyer(db_conn.DBConn):
             self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
-            self.database.rollback()
             return 530, "{}".format(str(e))
         return 200, "ok"
 
@@ -280,7 +272,6 @@ class Buyer(db_conn.DBConn):
             self.database.rollback()
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
-            self.database.rollback()
             return 530, "{}".format(str(e)), ""
         return 200, "ok", result
 
@@ -305,7 +296,8 @@ class Buyer(db_conn.DBConn):
                     'UPDATE "user" set balance = balance + %s WHERE user_id = %s;',
                     (total_price, user_id),
                 )
-                self.database.commit()
+            elif state == 4:
+                return 200, "ok"
             self.cursor.execute(
                 "select book_id,count from order_book where order_id = %s;", (order_id,)
             )

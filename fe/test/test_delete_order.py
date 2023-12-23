@@ -64,3 +64,9 @@ class TestDeleteOrder :
         self.buyer.user_id = self.buyer.user_id + "_x"
         code = self.buyer.delete_order(self.order_id)
         assert code == 511
+
+    def test_delete_order_twice(self):
+        code = self.buyer.delete_order(self.order_id)
+        assert code == 200
+        code = self.buyer.delete_order(self.order_id)
+        assert code == 200

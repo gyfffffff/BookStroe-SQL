@@ -64,7 +64,6 @@ class Seller(db_conn.DBConn):
             self.database.rollback()
             return 528, "{}".format(str(e))
         except BaseException as e:
-            print(e)
             return 530, "{}".format(str(e))
         return 200, "ok"
 
