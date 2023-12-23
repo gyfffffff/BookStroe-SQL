@@ -27,7 +27,7 @@ class Buyer:
         #     print(item)
         r = requests.post(url, headers=headers, json=json)
         response_json = r.json()
-        # print("2929", response_json)
+        print("2929", response_json)
         return r.status_code, response_json.get("order_id")
 
     def payment(self, order_id: str):

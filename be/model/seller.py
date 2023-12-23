@@ -32,8 +32,8 @@ class Seller(db_conn.DBConn):
             if self.cursor.fetchone() is None:
                 tsvec = cut(book_info)  # 返回一个空格分割的字符串
                 self.cursor.execute(
-                    'INSERT into book(id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture)'
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    'INSERT into book(id, title, publisher, author, original_title, translator, pub_year, pages,currency_unit, binding, isbn, author_intro, book_intro, "content", tags, picture, _ts)'
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                     (
                         book_id,
                         book_info["title"],

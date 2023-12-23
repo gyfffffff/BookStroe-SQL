@@ -29,11 +29,56 @@ Base URLs:
 
 # Authentication
 
+# 后40%/seller
+
+## POST 发货
+
+POST /seller/send
+
+卖家发货
+
+> Body 请求参数
+
+```json
+{
+  "user_id": "string",
+  "order_id": "string"
+}
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|token|header|string| 否 |用户token|
+|body|body|object| 否 |none|
+|» user_id|body|string| 是 |卖家ID|
+|» order_id|body|string| 是 |要发货的订单ID|
+
+> 返回示例
+
+> 200 Response
+
+```json
+{}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
+|518|Unknown|无效订单|Inline|
+|528|Unknown|数据库错误|Inline|
+|530|Unknown|其他错误|Inline|
+
+### 返回数据结构
+
 # 后40%/buyer
 
-## GET search_global
+## POST search_global
 
-GET /buyer/search_global
+POST /buyer/search_global
 
 根据传入的关键词进行全局的图书搜索，支持传入多个关键词和分页。
 
@@ -64,9 +109,9 @@ GET /buyer/search_global
 
 ### 返回数据结构
 
-## GET search_store
+## POST search_store
 
-GET /buyer/search_store
+POST /buyer/search_store
 
 根据传入的关键词和书店ID进行店内图书搜索，支持传入多个关键词和分页。
 

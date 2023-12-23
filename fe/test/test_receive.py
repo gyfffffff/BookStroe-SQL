@@ -18,9 +18,9 @@ class TestReceive:
     seller: Seller
     @pytest.fixture(autouse=True)
     def pre_run_initialization(self):
-        self.seller_id = "test_send_seller_id_{}".format(str(uuid.uuid1()))
-        self.store_id = "test_send_store_id_{}".format(str(uuid.uuid1()))
-        self.buyer_id = "test_send_buyer_id_{}".format(str(uuid.uuid1()))
+        self.seller_id = "test_receive_seller_id_{}".format(str(uuid.uuid1()))
+        self.store_id = "test_receive_store_id_{}".format(str(uuid.uuid1()))
+        self.buyer_id = "test_receive_buyer_id_{}".format(str(uuid.uuid1()))
         self.password = self.seller_id
 
         # self.seller = register_new_seller(self.seller_id, self.password)

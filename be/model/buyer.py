@@ -3,7 +3,7 @@ import uuid
 import logging
 from be.model import db_conn, user
 from be.model import error
-import jieba
+from fe.test.utils import cut_word
 
 
 class Buyer(db_conn.DBConn):
@@ -33,6 +33,14 @@ class Buyer(db_conn.DBConn):
             uid = "{}_{}_{}".format(user_id, store_id, str(uuid.uuid1()))
 
             order_price = 0
+            create_time = self.get_current_time()
+            pay_ddl = self.get_time_after_30_min()
+            status = 0  # 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 4: 已取消
+            self.cursor.execute(
+                'INSERT INTO "order"(order_id, user_id, store_id, create_time, pay_ddl, status, price) '
+                "VALUES(%s, %s, %s, %s, %s, %s, %s);",
+                (uid, user_id, store_id, create_time, pay_ddl, status, order_price),
+            )
             for book_id, count in id_and_count:
                 # 拿到(stock_level, price)-->store, 就不需要解析json了
                 cursor = self.cursor.execute(
@@ -54,25 +62,21 @@ class Buyer(db_conn.DBConn):
                     "WHERE store_id = %s and book_id = %s and stock_level >= %s; ",
                     (count, store_id, book_id, count),
                 )
-
                 order_price += count * price
                 self.cursor.execute(
                     "INSERT INTO order_book(order_id, book_id, count) "
                     "VALUES(%s, %s, %s);",
                     (uid, book_id, count),
                 )
-            create_time = self.get_current_time()
-            pay_ddl = self.get_time_after_30_min()
-            status = 0  # 0: 未支付, 1: 已支付未发货, 2: 已发货未收货, 3: 已收货, 4: 已取消
             self.cursor.execute(
-                'INSERT INTO "order"(order_id, user_id, store_id, create_time, pay_ddl, status, price) '
-                "VALUES(%s, %s, %s, %s, %s, %s, %s);",
-                (uid, user_id, store_id, create_time, pay_ddl, status, order_price),
+                'UPDATE "order" set price = %s WHERE order_id = %s',
+                (order_price, uid),
             )
 
             self.database.commit()
             order_id = uid
         except psycopg2.Error as e:
+            self.database.rollback()
             logging.info("528, {}".format(str(e)))
             return 528, "{}".format(str(e)), ""
         except BaseException as e:
@@ -180,7 +184,7 @@ class Buyer(db_conn.DBConn):
                     pageSize = 5
             except:
                 return error.error_args("invalid pageIndex or pageSize")
-            key = jieba.cut(key)
+            key = cut_word(key)
             key = " | ".join(key)
             offset = (int(pageIndex) - 1) * int(pageSize)
             self.cursor.execute(
@@ -212,7 +216,7 @@ class Buyer(db_conn.DBConn):
                     pageSize = 5
             except:
                 return error.error_args("invalid pageIndex or pageSize") + ("",)
-            key = jieba.cut(key)
+            key = cut_word(key)
             key = " | ".join(key)
             offset = (int(pageIndex) - 1) * int(pageSize)
             self.cursor.execute(
